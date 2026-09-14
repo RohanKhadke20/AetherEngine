@@ -92,6 +92,31 @@ export class Vector2D {
         return Math.atan2(this.y, this.x);
     }
 
+    // Zero-allocation in-place mutation methods for high-frequency physics loops
+    copyFrom(v) {
+        this.x = v.x;
+        this.y = v.y;
+        return this;
+    }
+
+    addInPlace(v) {
+        this.x += v.x;
+        this.y += v.y;
+        return this;
+    }
+
+    subInPlace(v) {
+        this.x -= v.x;
+        this.y -= v.y;
+        return this;
+    }
+
+    multInPlace(n) {
+        this.x *= n;
+        this.y *= n;
+        return this;
+    }
+
     // Static operations for non-mutating calculations
     static add(v1, v2) {
         return new Vector2D(v1.x + v2.x, v1.y + v2.y);
