@@ -1,0 +1,15 @@
+{
+  "name": "aetherengine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deterministic 2D Newtonian gravity physics sandbox",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve .",
+    "test": "node test.mjs"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
