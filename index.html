@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherEngine: Orbit Collapse</title>
+    <meta name="description" content="AetherEngine: Orbit Collapse - A deterministic 2D Newtonian gravity physics sandbox built with HTML5 canvas and modular JavaScript.">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for premium futuristic tech look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Roboto+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sci-Fi HUD Control Console Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="title-logo">
+                    <span class="logo-glow"></span>
+                    <h1>AETHERENGINE</h1>
+                    <span class="subtitle">ORBIT COLLAPSE // PHASE 2</span>
+                </div>
+            </div>
+
+            <!-- Simulation Master Controls -->
+            <div class="control-group">
+                <h3>SIMULATION CONTROLS</h3>
+                <div class="button-row">
+                    <button id="btn-play-pause" class="btn btn-primary glow-cyan">
+                        <span class="icon">⏸</span> <span class="label">PAUSE</span>
+                    </button>
+                    <button id="btn-restart" class="btn btn-secondary">
+                        <span class="icon">🔄</span> <span class="label">RESTART</span>
+                    </button>
+                </div>
+                <div class="button-row" style="margin-top: 10px;">
+                    <button id="btn-clear" class="btn btn-danger">
+                        <span class="icon">🗑</span> <span class="label">CLEAR ASTEROIDS</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Parameters Grid (Sliders) -->
+            <div class="control-group">
+                <h3>PHYSICS PARAMETERS</h3>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Gravity Constant (G)</span>
+                        <span id="val-g" class="value">0.15</span>
+                    </div>
+                    <input type="range" id="slider-g" min="0.01" max="1.5" step="0.01" value="0.15">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Core Mass (M<sub>core</sub>)</span>
+                        <span id="val-core-mass" class="value">100000</span>
+                    </div>
+                    <input type="range" id="slider-core-mass" min="10000" max="500000" step="5000" value="100000">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Spawn Mass</span>
+                        <span id="val-spawn-mass" class="value">50</span>
+                    </div>
+                    <input type="range" id="slider-spawn-mass" min="5" max="500" step="5" value="50">
+                </div>
+
+                <div class="toggle-container">
+                    <span class="toggle-label">Draw Telemetry Vectors</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-vectors" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <span class="toggle-label">Draw Gravity Warp Grid</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-grid" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <span class="toggle-label">Draw Orbit Trails</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-trails" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Telemetry Stats Panel -->
+            <div class="control-group">
+                <h3>SYSTEM TELEMETRY</h3>
+                <div class="stats-panel">
+                    <div class="stat-row">
+                        <span class="stat-label">Active Asteroids</span>
+                        <span id="stat-count" class="stat-value text-cyan">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Sandbox Mass</span>
+                        <span id="stat-mass" class="stat-value text-magenta">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Core Consumption</span>
+                        <span id="stat-consumed" class="stat-value text-yellow">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Active Links</span>
+                        <span id="stat-links" class="stat-value text-green">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Simulation FPS</span>
+                        <span id="stat-fps" class="stat-value">60.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logistics Log Terminal -->
+            <div class="control-group terminal-container">
+                <h3>TELEMETRY DECRYPTOR LOG</h3>
+                <div id="log-terminal" class="terminal-log">
+                    <div class="log-line system-line">[SYSTEM] AetherEngine Sandbox initialized.</div>
+                    <div class="log-line system-line">[SYSTEM] Spacetime coordinate grid calibrated.</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Dynamic Viewport -->
+        <main class="viewport">
+            <!-- Strategic Game HUD Bar -->
+            <div class="hud-top">
+                <div class="hud-item" id="hud-stability">
+                    <span class="hud-label">CORE STABILITY</span>
+                    <span id="hud-stability-val" class="hud-value text-green">100%</span>
+                </div>
+                <div class="hud-item" id="hud-fuel">
+                    <span class="hud-label">AETHER FUEL</span>
+                    <span id="hud-fuel-val" class="hud-value text-cyan">100.0</span>
+                </div>
+                <div class="hud-item" id="hud-credits">
+                    <span class="hud-label">RESOURCES MINED</span>
+                    <span id="hud-credits-val" class="hud-value text-magenta">0 kT</span>
+                </div>
+                <div class="hud-item" id="hud-time">
+                    <span class="hud-label">SURVIVAL TIME</span>
+                    <span id="hud-time-val" class="hud-value text-yellow">0s</span>
+                </div>
+            </div>
+
+            <!-- Game Over Overlay Modal -->
+            <div id="game-over-overlay" class="game-over-overlay" style="display: none;">
+                <div class="game-over-modal">
+                    <h2>CORE COLLAPSE DETECTED</h2>
+                    <p class="warning-text">THE CENTRAL SINGULARITY HAS INSTABILIZED</p>
+                    <div class="score-report">
+                        <div class="score-row">
+                            <span class="score-label">Survival Time:</span>
+                            <span id="go-time" class="score-value text-yellow">0s</span>
+                        </div>
+                        <div class="score-row">
+                            <span class="score-label">Resources Mined:</span>
+                            <span id="go-mined" class="score-value text-cyan">0 kT</span>
+                        </div>
+                        <div class="score-row final-score">
+                            <span class="score-label">FINAL SCORE:</span>
+                            <span id="go-score" class="score-value text-green" style="font-weight: 800;">0</span>
+                        </div>
+                    </div>
+                    <button id="btn-go-restart" class="btn btn-primary glow-cyan" style="margin-top: 15px; width: 100%;">REINITIALIZE SECTOR</button>
+                </div>
+            </div>
+
+            <canvas id="physics-canvas"></canvas>
+            
+            <!-- Localized Anti-Gravity Emitter Hotbar -->
+            <div class="hotbar">
+                <button id="btn-tool-fling" class="hotbar-btn active" data-tool="fling">
+                    <span class="hotkey">1</span>
+                    <span class="btn-label">FLING ASTEROID</span>
+                </button>
+                <button id="btn-tool-inversion" class="hotbar-btn" data-tool="inversion">
+                    <span class="hotkey">2</span>
+                    <span class="btn-label">INVERSION FIELD</span>
+                </button>
+                <button id="btn-tool-shield" class="hotbar-btn" data-tool="shield">
+                    <span class="hotkey">3</span>
+                    <span class="btn-label">ZERO-G SHIELD</span>
+                </button>
+                <button id="btn-tool-diverter" class="hotbar-btn" data-tool="diverter">
+                    <span class="hotkey">4</span>
+                    <span class="btn-label">DIVERTER</span>
+                </button>
+                <button id="btn-tool-link" class="hotbar-btn" data-tool="link">
+                    <span class="hotkey">5</span>
+                    <span class="btn-label">STRUCTURAL BEAM</span>
+                </button>
+            </div>
+            
+            <!-- Mouse Instruction Overlay -->
+            <div class="hud-instructions">
+                <span>[L-CLICK] DEPLOY/FLING/CONNECT // [R-CLICK] RECYCLE // [1-5] SELECT TOOL</span>
+            </div>
+        </main>
+    </div>
+
+    <!-- Main Module Loading -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
