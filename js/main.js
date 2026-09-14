@@ -2,6 +2,9 @@ import { PhysicsEngine } from './physics.js';
 import { Renderer } from './renderer.js';
 import { UIManager } from './ui.js';
 import { runBrowserTest } from './test-runner.js';
+// WorkerBridge is available as an opt-in performance upgrade for high body-counts (>150).
+// To enable offloaded physics: import { WorkerBridge } from './workerBridge.js';
+// See js/workerBridge.js and js/physicsWorker.js for the full pipeline.
 
 // Global simulation variables
 let physics;
@@ -84,6 +87,9 @@ function loop(currentTime) {
         accumulator += frameTime;
         
         // Update physics deterministically in fixed-size intervals
+        // TODO: integrate WorkerBridge for offloaded physics
+        // Replace: physics.update(fixedDt) → bridge.tick(fixedDt, { G, coreMass, coreX, coreY })
+        // then reconcile returned body POJOs back into physics.asteroids via bridge.onFrame.
         while (accumulator >= fixedDt) {
             physics.update(fixedDt);
             accumulator -= fixedDt;
