@@ -2,6 +2,13 @@
 
 > A deterministic 2D Newtonian gravity physics sandbox and orbital mechanics simulation engine built with modern HTML5 Canvas and modular JavaScript.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![HTML5 Canvas](https://img.shields.io/badge/Rendering-HTML5%20Canvas-E34F26?logo=html5&logoColor=white)
+![JavaScript ES6+](https://img.shields.io/badge/ES6%2B-Modular-F7DF1E?logo=javascript&logoColor=black)
+![Unit Tests Passing](https://img.shields.io/badge/Unit%20Tests-35%2F35%20Passing-brightgreen?logo=node.js)
+![Zero External Dependencies](https://img.shields.io/badge/Dependencies-0%20External-blueviolet)
+![Physics 60 FPS](https://img.shields.io/badge/Physics%20Loop-60%20FPS-00f0ff)
+
 ---
 
 ## 🌟 Overview
@@ -9,6 +16,39 @@
 **AetherEngine: Orbit Collapse** is an interactive, browser-native computational physics simulation that models $N$-body gravitational interactions, planetary orbital stability, and momentum-conserving celestial collisions. Designed with a modular architecture, the engine isolates vector mathematics, physics solvers, kinetic emitters, and canvas rendering into decoupled modules.
 
 The engine includes a full **headless test suite** with 35 deterministic unit assertions verifying orbital decay, conservation of linear momentum, and celestial mechanics.
+
+---
+
+## 🏗️ Architecture & Physics Pipeline
+
+```mermaid
+flowchart TD
+    subgraph UI ["🕹️ User & Keyboard Input"]
+        InputHandler["Hotkeys [1-5, Space, R, C] / Mouse Events"]
+        Sliders["Physics Sliders: G, Core Mass, Spawn Mass"]
+    end
+
+    subgraph Loop ["⚙️ Simulation Loop (60 FPS)"]
+        Tick["requestAnimationFrame() Tick"]
+        Solver["Newtonian Gravitational Solver<br/>F = G * (m1 * m2) / r²"]
+        Fields["Force Field Modifiers<br/>• Inversion Fields (Repulsion)<br/>• Zero-G Shields<br/>• Velocity Diverters"]
+        Collision["Inelastic Collision & Coalescence<br/>Mass & Momentum Conserved"]
+        Springs["Structural Beams & Stress Tensor"]
+        Mining["Aether Harvesters & Rogue Spawners"]
+    end
+
+    subgraph Graphics ["🎨 HTML5 Canvas Render Pipeline"]
+        Grid["Spacetime Warp Grid"]
+        Trails["Orbit History & Prediction Vectors"]
+        Particles["Exhaust Particle System"]
+        HUD["System Telemetry & Health HUD"]
+    end
+
+    InputHandler --> Loop
+    Sliders --> Loop
+    Tick --> Solver --> Fields --> Collision --> Springs --> Mining
+    Mining --> Grid --> Trails --> Particles --> HUD
+```
 
 ---
 
@@ -31,6 +71,22 @@ The engine includes a full **headless test suite** with 35 deterministic unit as
 
 ---
 
+## ⌨️ Controls & Keyboard Shortcuts
+
+| Shortcut | Action | Description |
+| :--- | :--- | :--- |
+| `Space` | **Pause / Resume** | Freezes simulation time without resetting state |
+| `R` | **Restart** | Re-initializes celestial bodies and sector telemetry |
+| `C` | **Clear Asteroids** | Removes all dynamic bodies from the canvas |
+| `1` | **Fling Asteroid** | Click-and-drag to aim and launch celestial projectile |
+| `2` | **Inversion Field** | Click to deploy localized anti-gravity repulsion zone |
+| `3` | **Zero-G Shield** | Click to place an inertia-dampening gravitational barrier |
+| `4` | **Diverter** | Click to deploy a tangential velocity deflector |
+| `5` | **Structural Beam**| Click two asteroids to link them with a stress-bearing spring |
+| `Right Click` | **Recycle / Delete** | Removes hovered asteroid or emitter |
+
+---
+
 ## 📁 Repository Structure
 
 ```text
@@ -38,7 +94,9 @@ AetherEngine/
 ├── index.html           # Sci-Fi HUD control interface & simulation viewport
 ├── style.css            # Cyber-themed styling & telemetry design system
 ├── test.mjs             # Headless automated unit test runner (Node.js)
-├── .gitignore           # Git ignore rules
+├── LICENSE              # MIT License
+├── CONTRIBUTING.md      # Contribution & PR guidelines
+├── .github/             # GitHub issue templates
 ├── js/
 │   ├── vector.js        # 2D Euclidean Vector math library
 │   ├── asteroid.js      # Celestial body state & mass representation
@@ -55,12 +113,15 @@ AetherEngine/
 
 ## 🏃 Getting Started
 
-### 1. Running the Simulation
+### 1. Instant Run in Browser
 Simply open `index.html` in any modern web browser or serve via any static file server:
 
 ```bash
 # Using Python static server
 python -m http.server 3000
+
+# Or using Node.js npx serve
+npx serve .
 ```
 
 Navigate to `http://localhost:3000` to interact with the physics controls, spawn celestial bodies, and manipulate gravitational fields.
@@ -73,12 +134,16 @@ Run the standalone verification suite without browser dependencies:
 node test.mjs
 ```
 
-**Output:**
+**Test Output:**
 ```text
 =========================================
   AETHERENGINE: RUNNING HEADLESS TESTS   
 =========================================
+
 [PASS] Vector magnitude calculation correct (3,4 -> 5)
+[PASS] Vector static addition correct
+[PASS] Vector instance addition correct
+[PASS] Vector normalization results in unit vector
 [PASS] Orbital velocity calculation matches theoretical: 15.767 vs 15.767
 [PASS] Orbit remains stable and circular: Max distance deviation is 0.13px (0.06% eccentricity)
 [PASS] Asteroids merged successfully into 1 body
@@ -94,4 +159,4 @@ TEST RUN COMPLETE. Passed: 35, Failed: 0
 
 ## 📜 License
 
-MIT License &copy; 2026 Rohan Khadke. Free to use, adapt, and build upon.
+MIT License &copy; 2026 Rohan Khadke. Free to use, adapt, and build upon. See [LICENSE](LICENSE) for details.

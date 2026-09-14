@@ -138,6 +138,12 @@ export class UIManager {
             else if (e.key === '3') this.selectTool('shield');
             else if (e.key === '4') this.selectTool('diverter');
             else if (e.key === '5') this.selectTool('link');
+            else if (e.code === 'Space') {
+                e.preventDefault();
+                this.togglePlayPause();
+            }
+            else if (e.key === 'r' || e.key === 'R') this.restartSimulation();
+            else if (e.key === 'c' || e.key === 'C') this.clearAsteroids();
         });
     }
 
